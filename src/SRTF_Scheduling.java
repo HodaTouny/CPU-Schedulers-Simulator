@@ -16,10 +16,10 @@ public class SRTF_Scheduling implements SchedulingAlgorithm {
             Process Lowest_Burst = null;
 
             for (Process process : processes) {
-                if (process.arrivalTime <= currentTime && process.Burst_Time > 0) {
+                if (process.arrivalTime <= currentTime && process.burstTime > 0) {
                     if (Lowest_Burst == null ||
-                            process.Burst_Time < Lowest_Burst.Burst_Time ||
-                            (process.Burst_Time == Lowest_Burst.Burst_Time && process.AgingFactor > Lowest_Burst.AgingFactor)) {
+                            process.burstTime < Lowest_Burst.burstTime ||
+                            (process.burstTime == Lowest_Burst.burstTime && process.agingFactor > Lowest_Burst.agingFactor)) {
                         Lowest_Burst = process;
                     }
                 }
@@ -27,29 +27,29 @@ public class SRTF_Scheduling implements SchedulingAlgorithm {
             if (Lowest_Burst == null) {
                 currentTime++;
             } else {
-                System.out.println("Executing process " + Lowest_Burst.Name + " at time " + currentTime);
+                System.out.println("Executing process " + Lowest_Burst.name + " at time " + currentTime);
                 currentTime++;
-                Lowest_Burst.Burst_Time--;
+                Lowest_Burst.burstTime--;
 
                 for (Process process : processes) {
-                    if (process != Lowest_Burst && process.arrivalTime <= currentTime && process.Burst_Time > 0) {
-                        process.AgingFactor++;
+                    if (process != Lowest_Burst && process.arrivalTime <= currentTime && process.burstTime > 0) {
+                        process.agingFactor++;
                     }
                 }
 
-                if (Lowest_Burst.Burst_Time == 0) {
+                if (Lowest_Burst.burstTime == 0) {
                     cntCompletedProcesses++;
-                    turnaroundTime.put(Lowest_Burst.Name, currentTime - Lowest_Burst.arrivalTime);
-                    waitingTime.put(Lowest_Burst.Name, turnaroundTime.get(Lowest_Burst.Name) - Lowest_Burst.originalBurstTime);
-                    System.out.println("Executing process " + Lowest_Burst.Name + " completed at time " + currentTime);
+                    turnaroundTime.put(Lowest_Burst.name, currentTime - Lowest_Burst.arrivalTime);
+                    waitingTime.put(Lowest_Burst.name, turnaroundTime.get(Lowest_Burst.name) - Lowest_Burst.originalBurstTime);
+                    System.out.println("Executing process " + Lowest_Burst.name + " completed at time " + currentTime);
                 }
             }
         }
 
         for (Process process : processes) {
-            System.out.println("Process " + process.Name +
-                    " - Waiting Time: " + waitingTime.get(process.Name) +
-                    ", Turnaround Time: " + turnaroundTime.get(process.Name));
+            System.out.println("Process " + process.name +
+                    " - Waiting Time: " + waitingTime.get(process.name) +
+                    ", Turnaround Time: " + turnaroundTime.get(process.name));
         }
         double avgWaitingTime = waitingTime.values().stream().mapToInt(Integer::intValue).average().orElse(0);
         double avgTurnaroundTime = turnaroundTime.values().stream().mapToInt(Integer::intValue).average().orElse(0);

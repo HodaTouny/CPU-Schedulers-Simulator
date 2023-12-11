@@ -22,26 +22,26 @@ public class SJF_Scheduling implements SchedulingAlgorithm {
 
         while (!processes.isEmpty()) {
             Process lowest_burst = null;
-            Boolean found = false;
+            boolean found = false;
 
 
             for (Process process : processes) {
                 if (process.arrivalTime <= currentTime
-                     && (found == false || process.Burst_Time < lowest_burst.Burst_Time)) {
+                     && (!found || process.burstTime < lowest_burst.burstTime)) {
                     lowest_burst = process;
                     found =true;
                 }
             }
 
-            if (found == false) {
+            if (!found) {
                 currentTime++;
             } else {
                 processes.remove(lowest_burst);
-                System.out.println("Executing: " + lowest_burst.Name);
+                System.out.println("Executing: " + lowest_burst.name);
                 WaitTime = currentTime - lowest_burst.arrivalTime;
                 System.out.println("waiting time: " + WaitTime);
                 totalWaitTime += WaitTime;
-                currentTime += lowest_burst.Burst_Time;
+                currentTime += lowest_burst.burstTime;
                 TurnaroundTime = currentTime - lowest_burst.arrivalTime;
                 System.out.println("turn around time: " + TurnaroundTime);
 

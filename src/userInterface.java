@@ -26,8 +26,8 @@ public class userInterface{
             System.out.print("Process Burst Time: ");
             int burstTime = scanner.nextInt();
 //
-//            System.out.print("Process Priority: ");
-            int priority=0 ;
+            System.out.print("Process Priority: ");
+            int priority= scanner.nextInt();
 //
 //            System.out.print("Process Quantum: ");
           int quantum=0;
@@ -58,7 +58,7 @@ public class userInterface{
                     scheduler = new SRTF_Scheduling();
                     break;
                 case 3:
-                   // scheduler = new Priority_Scheduling();
+                    scheduler = new PriorityScheduling(0);
                     break;
                 case 4:
                    // scheduler = new AG_Scheduling();
@@ -76,4 +76,4 @@ public class userInterface{
 
 
 
-    };
+    }

@@ -1,20 +1,19 @@
 public class Process {
-    public  String Name;
-    public  String Color;
+    public  String name;
+    public  String color;
     public  int arrivalTime;
-    public  int  Burst_Time;
-    public int  Priority_Number;
+    public  int burstTime;
+    public int priorityNumber;
     public int originalBurstTime;
-    public int AgingFactor;
-
+    public int agingFactor;
 
 
     Process(String name, String color, int arrivalTime, int burstTime, int priority, int quantum) {
-        this.Name = name;
-        this.Color = color;
+        this.name = name;
+        this.color = color;
         this.arrivalTime = arrivalTime;
-        this.Burst_Time = burstTime;
-        this.Priority_Number = priority;
+        this.burstTime = burstTime;
+        this.priorityNumber = priority;
         this.originalBurstTime = burstTime;
 
     }
