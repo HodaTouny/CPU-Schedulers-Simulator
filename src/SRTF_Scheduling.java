@@ -3,6 +3,7 @@ import java.util.*;
 public class SRTF_Scheduling implements SchedulingAlgorithm {
     Vector<Process> Arrived_Processes = new Vector<>();
     Vector<Process> Answer = new Vector<>();
+
     public int Current_Time = 0;
     @Override
     public void CPUScheduling(Vector<Process> processes) {
@@ -12,7 +13,7 @@ public class SRTF_Scheduling implements SchedulingAlgorithm {
             Iterator<Process> iterator = processes.iterator();
             while (iterator.hasNext()) {
                 Process process = iterator.next();
-                if (Current_Time == process.arrivalTime) {
+                if (Current_Time >= process.arrivalTime) {
                     Arrived_Processes.add(process);
                     iterator.remove();
                 }
@@ -27,6 +28,8 @@ public class SRTF_Scheduling implements SchedulingAlgorithm {
                 currentProcess.Burst_Time--;
                 Answer.add(currentProcess);
                 if (currentProcess.Burst_Time == 0) {
+                    currentProcess.TernARound = currentProcess.End_Time - currentProcess.Start_Time;
+                    currentProcess.WaitingTime = currentProcess.TernARound - currentProcess.originalBurstTime;
                     Arrived_Processes.remove(currentProcess);
                     currentProcess.End_Time = Current_Time;
                 }

@@ -8,6 +8,8 @@ public class Process {
     public int AgingFactor;
     public int Start_Time;
     public int End_Time;
+    public int TernARound;
+    public int WaitingTime;
 
     Process(String name, String color, int arrivalTime, int burstTime, int priority, int quantum,int StartTime,int EndTime) {
         this.Name = name;
@@ -17,6 +19,8 @@ public class Process {
         this.Priority_Number = priority;
         this.originalBurstTime = burstTime;
         this.AgingFactor =0;
+        this.TernARound = 0;
+        this.WaitingTime =0;
         this.Start_Time = StartTime;
         this.End_Time = EndTime;
 
