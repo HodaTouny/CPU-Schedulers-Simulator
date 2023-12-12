@@ -31,7 +31,7 @@ public class SRTF_Scheduling implements SchedulingAlgorithm {
                     currentProcess.End_Time = Current_Time;
                 }
                 for (Process process : Arrived_Processes) {
-                    process.Priority_Number++;
+                    process.AgingFactor++;
                 }
             }
             Current_Time++;
@@ -43,7 +43,7 @@ public class SRTF_Scheduling implements SchedulingAlgorithm {
     public static Vector<Process> sortProcesses(Vector<Process> processes) {
         Vector<Process> sortedProcesses = new Vector<>(processes);
 
-        Collections.sort(sortedProcesses, Comparator.comparing(Process::getBurstTime).thenComparing(Process::getPriorityNumber));
+        Collections.sort(sortedProcesses, Comparator.comparing(Process::getBurstTime).thenComparing(Process::getAgingFactor));
 
         return sortedProcesses;
     }

@@ -16,6 +16,7 @@ public class Process {
         this.Burst_Time = burstTime;
         this.Priority_Number = priority;
         this.originalBurstTime = burstTime;
+        this.AgingFactor =0;
         this.Start_Time = StartTime;
         this.End_Time = EndTime;
 
@@ -26,7 +27,7 @@ public class Process {
     }
 
 
-    public int getPriorityNumber() {
-        return Priority_Number;
+    public int getAgingFactor() {
+        return AgingFactor;
     }
 }
