@@ -31,8 +31,10 @@ public class userInterface{
 //
 //            System.out.print("Process Quantum: ");
           int quantum=0;
+          int StartTime = 0;
+          int EndTime =0;
 
-            Process process = new Process(name, color, arrivalTime, burstTime, priority, quantum);
+            Process process = new Process(name, color, arrivalTime, burstTime, priority, quantum,StartTime,EndTime);
              processes.add(process);
         }
         while (true) {
