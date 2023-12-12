@@ -11,7 +11,7 @@ public class PriorityScheduling implements SchedulingAlgorithm {
 
     @Override
     public void CPUScheduling(Vector<Process> processes) {
-        Collections.sort(processes, Comparator.comparingInt(p -> p.priorityNumber));
+        Collections.sort(processes, Comparator.comparingInt(p -> p.Priority_Number));
         int size = processes.size();
         int currentTime = 0;
         double totalWaitTime = 0;
@@ -24,8 +24,8 @@ public class PriorityScheduling implements SchedulingAlgorithm {
             Process highestPriority = processes.get(0);
             if (highestPriority.arrivalTime <= currentTime) {
                 processes.remove(highestPriority);
-                System.out.println("Executing: " + highestPriority.name);
-                completionTime = currentTime + highestPriority.burstTime;
+                System.out.println("Executing: " + highestPriority.Name);
+                completionTime = currentTime + highestPriority.Burst_Time;
                 System.out.println("Completion time: " + completionTime);
                 turnaroundTime = completionTime - highestPriority.arrivalTime;
                 System.out.println("Turnaround time: " + turnaroundTime);
@@ -33,14 +33,14 @@ public class PriorityScheduling implements SchedulingAlgorithm {
                 waitTime = turnaroundTime - highestPriority.originalBurstTime;
                 System.out.println("Waiting time: " + waitTime);
                 totalWaitTime += waitTime;
-                currentTime += highestPriority.burstTime;
+                currentTime += highestPriority.Burst_Time;
                 continue;
             }
 
             currentTime++;
             for (Process process : processes) {
                 if (process.arrivalTime <= currentTime) {
-                    process.priorityNumber--;
+                    process.Priority_Number--;
                 }
             }
         }

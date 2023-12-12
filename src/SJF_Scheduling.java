@@ -27,7 +27,7 @@ public class SJF_Scheduling implements SchedulingAlgorithm {
 
             for (Process process : processes) {
                 if (process.arrivalTime <= currentTime
-                     && (!found || process.burstTime < lowest_burst.burstTime)) {
+                     && (!found || process.Burst_Time < lowest_burst.Burst_Time)) {
                     lowest_burst = process;
                     found =true;
                 }
@@ -37,11 +37,11 @@ public class SJF_Scheduling implements SchedulingAlgorithm {
                 currentTime++;
             } else {
                 processes.remove(lowest_burst);
-                System.out.println("Executing: " + lowest_burst.name);
+                System.out.println("Executing: " + lowest_burst.Name);
                 WaitTime = currentTime - lowest_burst.arrivalTime;
                 System.out.println("waiting time: " + WaitTime);
                 totalWaitTime += WaitTime;
-                currentTime += lowest_burst.burstTime;
+                currentTime += lowest_burst.Burst_Time;
                 TurnaroundTime = currentTime - lowest_burst.arrivalTime;
                 System.out.println("turn around time: " + TurnaroundTime);
 
