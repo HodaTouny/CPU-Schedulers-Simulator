@@ -3,10 +3,8 @@ import java.util.Comparator;
 import java.util.Vector;
 
 public class PriorityScheduling implements SchedulingAlgorithm {
-    int contextSwitchingTime;
 
-    public PriorityScheduling(int contextSwitchingTime) {
-        this.contextSwitchingTime = contextSwitchingTime;
+    public PriorityScheduling() {
     }
 
     @Override

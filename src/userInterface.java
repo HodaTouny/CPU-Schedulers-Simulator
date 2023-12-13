@@ -18,7 +18,7 @@ public class userInterface{
             String name = scanner.next();
 //
 //            System.out.print("Process Color: ");
-           String color ="0";
+            String color ="0";
 
             System.out.print("Process Arrival Time: ");
             int arrivalTime = scanner.nextInt();
@@ -30,12 +30,12 @@ public class userInterface{
             int priority= scanner.nextInt();
 //
 //            System.out.print("Process Quantum: ");
-          int quantum=0;
-          int StartTime = 0;
-          int EndTime =0;
+            int quantum=0;
+            int StartTime = 0;
+            int EndTime =0;
+            Process process = new Process(name, color, arrivalTime, burstTime, priority, quantum,StartTime,EndTime,0);
 
-            Process process = new Process(name, color, arrivalTime, burstTime, priority, quantum,StartTime,EndTime);
-             processes.add(process);
+            processes.add(process);
         }
         while (true) {
             System.out.println("\nChoose a scheduling algorithm:");
@@ -60,10 +60,10 @@ public class userInterface{
                     scheduler = new SRTF_Scheduling();
                     break;
                 case 3:
-                    scheduler = new PriorityScheduling(0);
+                    scheduler = new PriorityScheduling();
                     break;
                 case 4:
-                   // scheduler = new AG_Scheduling();
+                    // scheduler = new AG_Scheduling();
                     break;
                 default:
                     System.out.println("Invalid choice.");
@@ -78,4 +78,4 @@ public class userInterface{
 
 
 
-    }
+}
