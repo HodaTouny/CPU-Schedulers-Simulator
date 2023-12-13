@@ -11,57 +11,63 @@ public class AG_Scheduling implements SchedulingAlgorithm {
     int currentTime = 0;
     int tempQuantum = 0;
     Process Current= null;
+    boolean flag = false;
+    boolean flagIf = false;
     @Override
     public void CPUScheduling(Vector<Process> processes) {
-            //AG_calc(processes);
         processes = processes.stream().sorted(Comparator.comparingInt(o -> o.arrivalTime)).collect(Collectors.toCollection(Vector::new));
-            while(!processes.isEmpty() || !readyQueue.isEmpty()){
-                newArrived = addArrivedProcesses(currentTime, processes,readyQueue,dieQueue);
-                if(newArrived.peek()!=null&&readyQueue!=null&&newArrived.peek().AGFactor<Current.AGFactor){
-                    Current= newArrived.peek();
-                    newArrived.remove(Current);
-                    for(Process p: newArrived){
-                        readyQueue.add(p);
-                    }
+        while (!processes.isEmpty() || !readyQueue.isEmpty()) {
+            newArrived = addArrivedProcesses(currentTime, processes, readyQueue, dieQueue, Current);
+            if (!newArrived.isEmpty()) {
+                Current = newArrived.peek();
+                newArrived.remove(Current);
+                for (Process p : newArrived) {
+                    readyQueue.add(p);
                 }
-                else if (newArrived.peek()!=null&&readyQueue!=null&&newArrived.peek().AGFactor>readyQueue.peek().AGFactor){
-                    Current= readyQueue.poll();
-                    for(Process p: newArrived){
-                        readyQueue.add(p);
-                    }
-                } else {
-                    Current= readyQueue.poll();
-                }
-                newArrived.clear();
-                tempQuantum = Current.quantumTime.get(Current.quantumTime.size() - 1);
-                temp =nonPreemptive( Current, currentTime, tempQuantum, readyQueue, dieQueue, processes);
-                currentTime = temp.get(0);
-                tempQuantum = temp.get(1);
-                while(true) {
-                    readyQueue = addArrivedProcesses(currentTime, processes, readyQueue, dieQueue);
-                    if (!readyQueue.isEmpty() && Current.AGFactor >= readyQueue.peek().AGFactor) {
-                        checkQuantum(Current, tempQuantum, readyQueue, dieQueue, processes);
+            } else if (!readyQueue.isEmpty()) {
+                Current = readyQueue.poll();
+            }
+        }
+        newArrived.clear();
+        tempQuantum = Current.quantumTime.get(Current.quantumTime.size() - 1);
+        temp = nonPreemptive(Current, currentTime, tempQuantum, readyQueue, dieQueue, processes);
+        currentTime = temp.get(0);
+        tempQuantum = temp.get(1);
+        while (true) {
+            newArrived = addArrivedProcesses(currentTime, processes, readyQueue, dieQueue, Current);
+            if ((!newArrived.isEmpty() && Current.AGFactor >= newArrived.peek().AGFactor) || tempQuantum == 0) {
+                UpdateQuantum(Current, tempQuantum, readyQueue, dieQueue, processes);
+                flagIf = true;
+                break;
+            } else if (newArrived.isEmpty()) {
+                for (Process p : readyQueue) {
+                    if (Current.AGFactor >= p.AGFactor) {
+                        Current = p;
+                        flagIf = true;
                         break;
-
-                    } else {
-                        Current.Burst_Time--;
-                        currentTime++;
-                        tempQuantum--;
-                        if (Current.Burst_Time == 0) {
-                            Current.quantumTime.add(Current.quantumTime.get(Current.quantumTime.size() - 1) + tempQuantum);
-                            dieQueue.add(Current);
-                            processes.remove(Current);
-                            break;
-                        }
-
                     }
+                }
+                break;
+            }
+            if (!flagIf) {
+                Current.Burst_Time--;
+                currentTime++;
+                tempQuantum--;
+                if (Current.Burst_Time == 0) {
+                    Current.quantumTime.add(0);
+                    dieQueue.add(Current);
+                    processes.remove(Current);
+                    System.out.println("quantum didn't finish and done");
+                    break;
                 }
             }
         }
-    public Queue<Process> addArrivedProcesses(int currentTime, Vector<Process> processes,Queue<Process> readyQueue,Queue<Process> dieQueue) {
+    }
+
+    public Queue<Process> addArrivedProcesses(int currentTime, Vector<Process> processes,Queue<Process> readyQueue,Queue<Process> dieQueue,Process Current) {
         Queue<Process> arrivedProcesses = new LinkedList<>();
         for (Process p : processes) {
-            if (currentTime >= p.arrivalTime &&!readyQueue.contains(p)&&!dieQueue.contains(p) ) {
+            if (currentTime >= p.arrivalTime &&!readyQueue.contains(p)&&!dieQueue.contains(p)&&!p.equals(Current)) {
                 arrivedProcesses.add(p);
             }
         }
@@ -99,13 +105,15 @@ public class AG_Scheduling implements SchedulingAlgorithm {
         temp.add(tempQuantum);
         return temp;
     }
-    public  int checkQuantum(Process current, int tempQuantum, Queue<Process> readyQueue,
-                                    Queue<Process> dieQueue, Vector<Process> processes) {
+    public  int UpdateQuantum(Process current, int tempQuantum, Queue<Process> readyQueue,
+                              Queue<Process> dieQueue, Vector<Process> processes) {
         if(tempQuantum == 0) {
             if (current.Burst_Time == 0) {
                 current.quantumTime.add(0);
                 dieQueue.add(current);
                 processes.remove(current);
+                System.out.println("quantum finished and  done");
+
 
             } else {
                 int meanQuantum = calculateMeanQuantum(processes);
@@ -113,11 +121,14 @@ public class AG_Scheduling implements SchedulingAlgorithm {
                 current.quantumTime.add(newQuantum);
                 readyQueue.add(current);
                 tempQuantum = newQuantum;
+                System.out.println("quantum finished and not done");
             }
         }else{
                 current.quantumTime.add(current.quantumTime.get(current.quantumTime.size() - 1) + tempQuantum);
                 readyQueue.add(current);
-            }
+            System.out.println("quantum didn't finish and not done");
+
+        }
         return tempQuantum;
     }
 
