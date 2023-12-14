@@ -16,6 +16,7 @@ public class PriorityScheduling implements SchedulingAlgorithm {
         int completionTime;
         int waitTime;
         int turnaroundTime;
+        final int agingFactor = 8;
         Vector<Process> arrivedProcesses = new Vector<>();
         while (!processes.isEmpty()) {
             for (Process process : processes) {
@@ -30,10 +31,12 @@ public class PriorityScheduling implements SchedulingAlgorithm {
                 continue;
             }
             Process highestPriority = arrivedProcesses.remove(0);
-            for (Process arrivedProcess : arrivedProcesses) {
-                for (Process process : processes) {
-                    if (arrivedProcess.Name.equals(process.Name)) {
-                        process.Priority_Number--;}
+            if (currentTime!=0 && currentTime% agingFactor == 0){
+                for (Process arrivedProcess : arrivedProcesses) {
+                    for (Process process : processes) {
+                        if (arrivedProcess.Name.equals(process.Name)) {
+                            process.Priority_Number--;}
+                    }
                 }
             }
 
