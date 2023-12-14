@@ -26,7 +26,7 @@ public class Process {
         this.AgingFactor =0;
         this.TernARound = 0;
         this.WaitingTime =0;
-        this.Start_Time = StartTime;
+        this.Start_Time = 0;
         this.End_Time = EndTime;
         this.quantumTime = new Vector<>();
         this.quantumTime.add(quantum);

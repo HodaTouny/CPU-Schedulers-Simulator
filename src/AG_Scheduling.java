@@ -13,6 +13,12 @@ public class AG_Scheduling implements SchedulingAlgorithm {
     boolean ProcessFinished = false;
     Process oldProcess = null;
 
+    int totalWaitingTime = 0;
+    int totalTurnaroundTime = 0;
+
+    private static Map<Process, Integer> waitingTimes = new HashMap<>();
+    private static Map<Process, Integer> turnaroundTimes = new HashMap<>();
+
     public Queue<Process> addArrivedProcesses(int currentTime, Vector<Process> processes, Queue<Process> readyQueue, Process current, Queue<Process> dieQueue) {
         for (Process p : processes) {
             if (currentTime >= p.arrivalTime && !readyQueue.contains(p) && current != p && !dieQueue.contains(p)) {
@@ -63,6 +69,11 @@ public class AG_Scheduling implements SchedulingAlgorithm {
             tempQuantum -= npTime;
 
         } else {
+            current.End_Time=currentTime;
+            current.TernARound=current.End_Time-current.arrivalTime;
+            current.WaitingTime=current.TernARound-current.originalBurstTime;
+            waitingTimes.put(current, current.WaitingTime);
+            turnaroundTimes.put(current, current.TernARound);
             current.quantumTime.add(0);
             dieQueue.add(current);
             processes.remove(current);
@@ -82,12 +93,19 @@ public class AG_Scheduling implements SchedulingAlgorithm {
         Vector<Object> temp = new Vector<>();
         boolean isFinished = false;
         if (tempQuantum == 0 && current.Burst_Time != 0){
-                int meanQuantum = calculateMeanQuantum(processes);
-                int newQuantum = (int) Math.ceil(1.1 * meanQuantum);
-                current.quantumTime.add(newQuantum);
-                tempQuantum = newQuantum;
-                 isFinished = true;
+            int meanQuantum = calculateMeanQuantum(processes);
+            int newQuantum = (int) Math.ceil(1.1 * meanQuantum);
+            current.quantumTime.add(newQuantum);
+            tempQuantum = newQuantum;
+            isFinished = true;
         } else if (current.Burst_Time==0){
+
+            Current.End_Time=currentTime;
+            Current.TernARound=Current.End_Time-Current.arrivalTime;
+            Current.WaitingTime=Current.TernARound-Current.originalBurstTime;
+            waitingTimes.put(Current, Current.WaitingTime);
+            turnaroundTimes.put(Current, Current.TernARound);
+
             current.quantumTime.add(0);
             dieQueue.add(current);
             processes.remove(current);
@@ -135,6 +153,7 @@ public class AG_Scheduling implements SchedulingAlgorithm {
 
     @Override
     public void CPUScheduling(Vector<Process> processes) {
+        int Size=processes.size();
         //AG_calc(processes);
         while (!readyQueue.isEmpty() || !processes.isEmpty()) {
             readyQueue = addArrivedProcesses(currentTime, processes, readyQueue, Current, dieQueue);
@@ -142,12 +161,13 @@ public class AG_Scheduling implements SchedulingAlgorithm {
                 currentTime++;
                 continue;
             } else if (Current == null && !readyQueue.isEmpty()) {
+
                 Current = findSmallestProcess(readyQueue);
                 tempQuantum = Current.quantumTime.get(Current.quantumTime.size() - 1);
             } else {
                 if (ProcessFinished) {
                     if (!dieQueue.contains(Current)){
-                    readyQueue.add(Current);}
+                        readyQueue.add(Current);}
                     Current = readyQueue.remove();
                     tempQuantum = Current.quantumTime.get(Current.quantumTime.size() - 1);
                 } else {
@@ -162,29 +182,49 @@ public class AG_Scheduling implements SchedulingAlgorithm {
                     }
                 }
             }
-                temp = nonPreemptive(Current, currentTime, tempQuantum, dieQueue, processes);
-                currentTime = (int) temp.get(0);
-                tempQuantum = (int) temp.get(1);
-                ProcessFinished = (boolean) temp.get(2);
-                if (!ProcessFinished) {
-                    readyQueue = addArrivedProcesses(currentTime, processes, readyQueue, Current, dieQueue);
-                    while (!checkIfAnyProcessSmallerThanCurrent(Current, readyQueue) && !ProcessFinished) {
-                        temp = Preemptive(Current, currentTime, tempQuantum);
-                        currentTime = (int) temp.get(0);
-                        tempQuantum = (int) temp.get(1);
-                        ProcessFinished = (boolean) temp.get(2);
-                        if (tempQuantum == 0) {
-                            ProcessFinished = true;
-                            break;
-                        }
-                        readyQueue = addArrivedProcesses(currentTime, processes, readyQueue, Current, dieQueue);
-                    }
-                    Vector<Object> temp = updateQuantum(Current, tempQuantum, readyQueue, dieQueue, processes);
-                    tempQuantum = (int) temp.get(0);
-                    ProcessFinished = (boolean) temp.get(1);
-                }
-
+            if (Current.getBurstTime() == Current.originalBurstTime) {
+                Current.Start_Time = currentTime;
             }
+            temp = nonPreemptive(Current, currentTime, tempQuantum, dieQueue, processes);
+            currentTime = (int) temp.get(0);
+            tempQuantum = (int) temp.get(1);
+            ProcessFinished = (boolean) temp.get(2);
+            if (!ProcessFinished) {
+                readyQueue = addArrivedProcesses(currentTime, processes, readyQueue, Current, dieQueue);
+                while (!checkIfAnyProcessSmallerThanCurrent(Current, readyQueue) && !ProcessFinished) {
+                    temp = Preemptive(Current, currentTime, tempQuantum);
+                    currentTime = (int) temp.get(0);
+                    tempQuantum = (int) temp.get(1);
+                    ProcessFinished = (boolean) temp.get(2);
+                    if (tempQuantum == 0) {
+                        ProcessFinished = true;
+                        break;
+                    }
+                    readyQueue = addArrivedProcesses(currentTime, processes, readyQueue, Current, dieQueue);
+                }
+                Vector<Object> temp = updateQuantum(Current, tempQuantum, readyQueue, dieQueue, processes);
+                tempQuantum = (int) temp.get(0);
+                ProcessFinished = (boolean) temp.get(1);
+            }
+
+        }
+        System.out.println("\nTurnaround Time Map:");
+        for (Map.Entry<Process, Integer> entry : turnaroundTimes.entrySet()) {
+            System.out.println("Process " + entry.getKey().Name + ": " + entry.getValue());
+            totalTurnaroundTime += entry.getValue();
+        }
+
+        System.out.println("\nWaiting Time Map:");
+        for (Map.Entry<Process, Integer> entry : waitingTimes.entrySet()) {
+            System.out.println("Process " + entry.getKey().Name + ": " + entry.getValue());
+            totalWaitingTime += entry.getValue();
+        }
+        System.out.println("total wait around time: "+ (float)totalWaitingTime/Size);
+        System.out.println("total turn around time: "+ (float)totalTurnaroundTime/Size);
+
+        System.out.println("\nQuantam history:");
+        for(Process p : dieQueue){
+            System.out.println(p.Name+" "+ p.quantumTime);
         }
     }
-
+}
