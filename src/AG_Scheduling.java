@@ -7,71 +7,65 @@ public class AG_Scheduling implements SchedulingAlgorithm {
     Queue<Process> readyQueue = new LinkedList<>();
     Queue<Process> newArrived = new LinkedList<>();
     Queue<Process> dieQueue = new LinkedList<>();
-    Vector<Integer> temp = new Vector<>();
+    Vector<Object> temp = new Vector<>();
     int currentTime = 0;
     int tempQuantum = 0;
     Process Current= null;
-    boolean flag = false;
-    boolean flagIf = false;
-    @Override
-    public void CPUScheduling(Vector<Process> processes) {
-        processes = processes.stream().sorted(Comparator.comparingInt(o -> o.arrivalTime)).collect(Collectors.toCollection(Vector::new));
-        while (!processes.isEmpty() || !readyQueue.isEmpty()) {
-            newArrived = addArrivedProcesses(currentTime, processes, readyQueue, dieQueue, Current);
-            if (!newArrived.isEmpty()) {
-                Current = newArrived.peek();
-                newArrived.remove(Current);
-                for (Process p : newArrived) {
-                    readyQueue.add(p);
-                }
-            } else if (!readyQueue.isEmpty()) {
-                Current = readyQueue.poll();
-            }
-        }
-        newArrived.clear();
-        tempQuantum = Current.quantumTime.get(Current.quantumTime.size() - 1);
-        temp = nonPreemptive(Current, currentTime, tempQuantum, readyQueue, dieQueue, processes);
-        currentTime = temp.get(0);
-        tempQuantum = temp.get(1);
-        while (true) {
-            newArrived = addArrivedProcesses(currentTime, processes, readyQueue, dieQueue, Current);
-            if ((!newArrived.isEmpty() && Current.AGFactor >= newArrived.peek().AGFactor) || tempQuantum == 0) {
-                UpdateQuantum(Current, tempQuantum, readyQueue, dieQueue, processes);
-                flagIf = true;
-                break;
-            } else if (newArrived.isEmpty()) {
-                for (Process p : readyQueue) {
-                    if (Current.AGFactor >= p.AGFactor) {
-                        Current = p;
-                        flagIf = true;
-                        break;
-                    }
-                }
-                break;
-            }
-            if (!flagIf) {
-                Current.Burst_Time--;
-                currentTime++;
-                tempQuantum--;
-                if (Current.Burst_Time == 0) {
-                    Current.quantumTime.add(0);
-                    dieQueue.add(Current);
-                    processes.remove(Current);
-                    System.out.println("quantum didn't finish and done");
-                    break;
-                }
-            }
-        }
-    }
-
-    public Queue<Process> addArrivedProcesses(int currentTime, Vector<Process> processes,Queue<Process> readyQueue,Queue<Process> dieQueue,Process Current) {
-        Queue<Process> arrivedProcesses = new LinkedList<>();
+    boolean ProcessFinished = false;
+//    @Override
+//    public void CPUScheduling(Vector<Process> processes) {
+//            //AG_calc(processes);
+//        processes = processes.stream().sorted(Comparator.comparingInt(o -> o.arrivalTime)).collect(Collectors.toCollection(Vector::new));
+//            while(!processes.isEmpty() || !readyQueue.isEmpty()){
+//                newArrived = addArrivedProcesses(currentTime, processes,readyQueue);
+//                if(newArrived.peek()!=null&&readyQueue!=null&&newArrived.peek().AGFactor<Current.AGFactor){
+//                    Current= newArrived.peek();
+//                    newArrived.remove(Current);
+//                    for(Process p: newArrived){
+//                        readyQueue.add(p);
+//                    }
+//                }
+//                else if (newArrived.peek()!=null&&readyQueue!=null&&newArrived.peek().AGFactor>readyQueue.peek().AGFactor){
+//                    Current= readyQueue.poll();
+//                    for(Process p: newArrived){
+//                        readyQueue.add(p);
+//                    }
+//                } else {
+//                    Current= readyQueue.poll();
+//                }
+//                newArrived.clear();
+//                tempQuantum = Current.quantumTime.get(Current.quantumTime.size() - 1);
+//                temp =nonPreemptive( Current, currentTime, tempQuantum, readyQueue, dieQueue, processes);
+//                currentTime = (int) temp.get(0);
+//                tempQuantum = (int) temp.get(1);
+//                while(true) {
+//                    readyQueue = addArrivedProcesses(currentTime, processes, readyQueue);
+//                    if (!readyQueue.isEmpty() && Current.AGFactor >= readyQueue.peek().AGFactor) {
+//                        checkQuantum(Current, tempQuantum, readyQueue, dieQueue, processes);
+//                        break;
+//
+//                    } else {
+//                        Current.Burst_Time--;
+//                        currentTime++;
+//                        tempQuantum--;
+//                        if (Current.Burst_Time == 0) {
+//                            Current.quantumTime.add(Current.quantumTime.get(Current.quantumTime.size() - 1) + tempQuantum);
+//                            dieQueue.add(Current);
+//                            processes.remove(Current);
+//                            break;
+//                        }
+//
+//                    }
+//                }
+//            }
+//        }
+    public Queue<Process> addArrivedProcesses(int currentTime, Vector<Process> processes,Queue<Process> readyQueue,Process current) {
         for (Process p : processes) {
-            if (currentTime >= p.arrivalTime &&!readyQueue.contains(p)&&!dieQueue.contains(p)&&!p.equals(Current)) {
-                arrivedProcesses.add(p);
+            if (currentTime >= p.arrivalTime && !readyQueue.contains(p)&& current != p) {
+                readyQueue.add(p);
             }
         }
-        return arrivedProcesses;
+        return readyQueue;
     }
 
     public void AG_calc(Vector<Process> processes) {
@@ -86,12 +80,34 @@ public class AG_Scheduling implements SchedulingAlgorithm {
             }
         }
     }
-    public static Vector<Integer>  nonPreemptive(Process current, int currentTime, int tempQuantum, Queue<Process> readyQueue,
-                                      Queue<Process> dieQueue, Vector<Process> processes) {
+ public static Vector<Object> Preemptive(Process Current, int currentTime, int tempQuantum, Queue<Process> readyQueue,
+                                         Queue<Process> dieQueue, Vector<Process> processes) {
+     boolean isFinished = false;
+     Current.Burst_Time--;
+     currentTime++;
+     tempQuantum--;
+     if (Current.Burst_Time == 0) {
+         Current.quantumTime.add(0);
+         dieQueue.add(Current);
+         processes.remove(Current);
+         readyQueue.remove(Current);
+         isFinished = true;
+     }
+     Vector<Object> temp = new Vector<>();
+     temp.add(currentTime);
+     temp.add(tempQuantum);
+     temp.add(isFinished);
+     return temp;
+ }
+    public static Vector<Object> nonPreemptive(Process current, int currentTime, int tempQuantum,
+                                               Queue<Process> dieQueue, Vector<Process> processes) {
+        boolean isFinished=false;
         int npTime = (int) ceil(current.quantumTime.get(current.quantumTime.size() - 1) / 2.0);
+        if(npTime>current.Burst_Time){
+            npTime = current.Burst_Time;
+        }
         currentTime += npTime;
         current.Burst_Time -= npTime;
-        System.out.println("Executing " + current.Name);
         if (current.Burst_Time > 0) {
             tempQuantum -= npTime;
 
@@ -99,21 +115,24 @@ public class AG_Scheduling implements SchedulingAlgorithm {
             current.quantumTime.add(0);
             dieQueue.add(current);
             processes.remove(current);
+            isFinished = true;
         }
-        Vector<Integer> temp = new Vector<>();
+        System.out.println("Executing " + current.Name);
+        Vector<Object> temp = new Vector<>();
         temp.add(currentTime);
         temp.add(tempQuantum);
+        temp.add(isFinished);
         return temp;
     }
-    public  int UpdateQuantum(Process current, int tempQuantum, Queue<Process> readyQueue,
-                              Queue<Process> dieQueue, Vector<Process> processes) {
+
+
+    public  int checkQuantum(Process current, int tempQuantum, Queue<Process> readyQueue,
+                                    Queue<Process> dieQueue, Vector<Process> processes) {
         if(tempQuantum == 0) {
             if (current.Burst_Time == 0) {
                 current.quantumTime.add(0);
                 dieQueue.add(current);
                 processes.remove(current);
-                System.out.println("quantum finished and  done");
-
 
             } else {
                 int meanQuantum = calculateMeanQuantum(processes);
@@ -121,14 +140,11 @@ public class AG_Scheduling implements SchedulingAlgorithm {
                 current.quantumTime.add(newQuantum);
                 readyQueue.add(current);
                 tempQuantum = newQuantum;
-                System.out.println("quantum finished and not done");
             }
         }else{
                 current.quantumTime.add(current.quantumTime.get(current.quantumTime.size() - 1) + tempQuantum);
                 readyQueue.add(current);
-            System.out.println("quantum didn't finish and not done");
-
-        }
+            }
         return tempQuantum;
     }
 
@@ -138,6 +154,69 @@ public class AG_Scheduling implements SchedulingAlgorithm {
             sumQuantum += process.quantumTime.get(process.quantumTime.size() - 1);
         }
         return sumQuantum / processes.size();
+    }
+
+    public boolean checkIfAnyProcessSmallerThanCurrent(Process current,Queue<Process>readyQueue){
+        for(Process p:readyQueue){
+            if(current.AGFactor>p.AGFactor){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static Process findSmallestProcess(Queue<Process> readyQueue) {
+        if (readyQueue.isEmpty()) {
+            return null;
+        }
+        Process smallestProcess = readyQueue.peek();
+        for (Process process : readyQueue) {
+            if (process.AGFactor< smallestProcess.AGFactor) {
+                smallestProcess = process;
+            }
+        }
+        readyQueue.remove(smallestProcess);
+        return smallestProcess;
+    }
+
+    @Override
+    public void CPUScheduling(Vector<Process> processes) {
+        //AG_calc(processes);
+        while (!readyQueue.isEmpty() || !processes.isEmpty()) {
+            readyQueue = addArrivedProcesses(currentTime, processes, readyQueue, Current);
+
+            if(Current == null && readyQueue.isEmpty()){
+                currentTime++;
+                continue;
+            }else if(Current == null && !readyQueue.isEmpty()){
+                Current = findSmallestProcess(readyQueue);
+            }else{
+                if (ProcessFinished) {
+                    Current = readyQueue.poll();
+                } else {
+                    for (Process p : readyQueue) {
+                        if (p.AGFactor < Current.AGFactor) {
+                            Current = p;
+                        }
+                    }
+
+                }
+            }
+            temp = nonPreemptive(Current, currentTime, tempQuantum, dieQueue, processes);
+            currentTime = (int) temp.get(0);
+            tempQuantum = (int) temp.get(1);
+            ProcessFinished = (boolean) temp.get(2);
+            if (!ProcessFinished) {
+                readyQueue = addArrivedProcesses(currentTime, processes, readyQueue, Current);
+                while (!checkIfAnyProcessSmallerThanCurrent(Current, readyQueue) && !ProcessFinished) {
+                    temp = Preemptive(Current, currentTime, tempQuantum, readyQueue, dieQueue, processes);
+                    currentTime = (int) temp.get(0);
+                    tempQuantum = (int) temp.get(1);
+                    ProcessFinished = (boolean) temp.get(2);
+                    readyQueue = addArrivedProcesses(currentTime, processes, readyQueue, Current);
+                }
+            }
+        }
     }
 }
 

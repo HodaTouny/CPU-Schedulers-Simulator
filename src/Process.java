@@ -14,6 +14,7 @@ public class Process {
     public int WaitingTime;
     public int AGFactor;
     public Vector<Integer> quantumTime;
+    public Vector<Duration> durations;
 
     Process(String name, String color, int arrivalTime, int burstTime, int priority, int quantum,int StartTime,int EndTime, int AGFactor) {
         this.Name = name;
@@ -30,6 +31,7 @@ public class Process {
         this.quantumTime = new Vector<>();
         this.quantumTime.add(quantum);
         this.AGFactor = AGFactor;
+        this.durations = new Vector<>();
 
     }
 
