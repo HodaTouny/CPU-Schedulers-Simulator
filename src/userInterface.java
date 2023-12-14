@@ -2,38 +2,30 @@ import java.util.Scanner;
 import java.util.Vector;
 
 public class userInterface{
-    public static void getUserInput() {
+    public  void getUserInput() {
         Scanner scanner = new Scanner(System.in);
         System.out.print("Enter the number of processes: ");
         int numProcesses = scanner.nextInt();
-//        System.out.print("Enter the round-robin quantum: ");
-//        int roundRobinQuantum = scanner.nextInt();
-//        System.out.print("Enter the context switching time: ");
-//        int contextSwitchingTime = scanner.nextInt();
 
         Vector<Process>processes=new Vector<>();
         for (int i = 1; i <= numProcesses; i++) {
             System.out.println("Enter details for Process " + i + ":");
             System.out.print("Process Name: ");
             String name = scanner.next();
-//
-//            System.out.print("Process Color: ");
-            String color ="0";
 
             System.out.print("Process Arrival Time: ");
             int arrivalTime = scanner.nextInt();
 
             System.out.print("Process Burst Time: ");
             int burstTime = scanner.nextInt();
-//
+
             System.out.print("Process Priority: ");
             int priority= scanner.nextInt();
-//
-//            System.out.print("Process Quantum: ");
-            int quantum=0;
-            int StartTime = 0;
-            int EndTime =0;
-            Process process = new Process(name, color, arrivalTime, burstTime, priority, quantum,StartTime,EndTime,0);
+
+            System.out.print("Process Quantum: ");
+            int quantum = scanner.nextInt();
+            String color ="0";
+            Process process = new Process(name, color, arrivalTime, burstTime, priority, quantum);
 
             processes.add(process);
         }
@@ -63,7 +55,7 @@ public class userInterface{
                     scheduler = new PriorityScheduling();
                     break;
                 case 4:
-                    // scheduler = new AG_Scheduling();
+                     scheduler = new AG_Scheduling();
                     break;
                 default:
                     System.out.println("Invalid choice.");
@@ -75,7 +67,4 @@ public class userInterface{
 
         System.out.println("Exiting the scheduler.");
     }
-
-
-
 }

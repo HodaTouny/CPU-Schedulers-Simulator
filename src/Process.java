@@ -16,21 +16,21 @@ public class Process {
     public Vector<Integer> quantumTime;
     public Vector<Duration> durations;
 
-    Process(String name, String color, int arrivalTime, int burstTime, int priority, int quantum,int StartTime,int EndTime, int AGFactor) {
+    Process(String name, String color, int arrivalTime, int burstTime, int priority, int quantum) {
         this.Name = name;
         this.Color = color;
         this.arrivalTime = arrivalTime;
         this.Burst_Time = burstTime;
         this.Priority_Number = priority;
         this.originalBurstTime = burstTime;
+        this.quantumTime = new Vector<>();
+        this.quantumTime.add(quantum);
         this.AgingFactor =0;
         this.TernARound = 0;
         this.WaitingTime =0;
-        this.Start_Time = StartTime;
-        this.End_Time = EndTime;
-        this.quantumTime = new Vector<>();
-        this.quantumTime.add(quantum);
-        this.AGFactor = AGFactor;
+        this.Start_Time = 0;
+        this.End_Time = 0;
+        this.AGFactor = 0;
         this.durations = new Vector<>();
 
     }
