@@ -18,10 +18,6 @@ public class Main {
         processes.add(p4);
         SchedulingAlgorithm sjf = new AG_Scheduling();
         sjf.CPUScheduling(processes);
-//        Vector<String> a = new Vector<>();
-//        a.add("1");
-//        addd(a);
-//        System.out.println(a);
 
     }
 
