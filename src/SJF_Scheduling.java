@@ -38,13 +38,12 @@ public class SJF_Scheduling implements SchedulingAlgorithm {
             } else {
                 processes.remove(lowest_burst);
                 System.out.println("Executing: " + lowest_burst.Name);
-                WaitTime = currentTime - lowest_burst.arrivalTime;
-                System.out.println("waiting time: " + WaitTime);
-                totalWaitTime += WaitTime;
-                currentTime += lowest_burst.Burst_Time;
+                currentTime += lowest_burst.Burst_Time+ contextSwitchingTime;
                 TurnaroundTime = currentTime - lowest_burst.arrivalTime;
                 System.out.println("turn around time: " + TurnaroundTime);
-
+                WaitTime = TurnaroundTime - lowest_burst.originalBurstTime;
+                System.out.println("waiting time: " + WaitTime);
+                totalWaitTime += WaitTime;
                 totalTurnaroundTime += TurnaroundTime;
             }
         }

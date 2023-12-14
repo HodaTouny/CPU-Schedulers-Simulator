@@ -46,7 +46,11 @@ public class SRTF_Scheduling implements SchedulingAlgorithm {
             Current_Time++;
         }
 
-        print(Answer);
+        if(!Answer.isEmpty()){
+            print(Answer);
+        }else{
+            System.out.println("No Process Enter!!");
+        }
     }
 
     public static Vector<Process> sortProcesses(Vector<Process> processes) {
@@ -82,6 +86,14 @@ public class SRTF_Scheduling implements SchedulingAlgorithm {
             TotalWaiting += p.WaitingTime;
             TotalTurnAround += p.TernARound;
 
+        }
+        System.out.println("TurnAround Time For Each Process");
+        for(Process p:finalAns){
+            System.out.println(p.Name + " " + p.TernARound);
+        }
+        System.out.println("Waiting Time For Each Process");
+        for(Process p:finalAns){
+            System.out.println(p.Name + " " + p.WaitingTime);
         }
         System.out.println("Average TurnAround Time : " + (float) TotalTurnAround/finalAns.size());
         System.out.println("Average Waiting Time : " + (float) TotalWaiting/finalAns.size());

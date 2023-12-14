@@ -27,7 +27,7 @@ public class AG_Scheduling implements SchedulingAlgorithm {
         return readyQueue;
     }
 
-    public void AG_calc(Vector<Process> processes) {
+    public void AG_calculation(Vector<Process> processes) {
         for (Process process : processes) {
             int rand = new Random().nextInt(20);
             if (rand < 10) {
@@ -159,7 +159,7 @@ public class AG_Scheduling implements SchedulingAlgorithm {
     @Override
     public void CPUScheduling(Vector<Process> processes) {
         int Size=processes.size();
-        AG_calc(processes);
+        AG_calculation(processes);
         while (!readyQueue.isEmpty() || !processes.isEmpty()) {
             readyQueue = addArrivedProcesses(currentTime, processes, readyQueue, Current, dieQueue);
             if (Current == null && readyQueue.isEmpty()) {
