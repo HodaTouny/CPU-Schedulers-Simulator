@@ -9,7 +9,6 @@ public class PriorityScheduling implements SchedulingAlgorithm {
 
     @Override
     public void CPUScheduling(Vector<Process> processes) {
-        Collections.sort(processes, Comparator.comparingInt(p -> p.Priority_Number));
         int size = processes.size();
         int currentTime = 0;
         double totalWaitTime = 0;
@@ -17,33 +16,43 @@ public class PriorityScheduling implements SchedulingAlgorithm {
         int completionTime;
         int waitTime;
         int turnaroundTime;
-
+        Vector<Process> arrivedProcesses = new Vector<>();
         while (!processes.isEmpty()) {
-            Process highestPriority = processes.get(0);
-            if (highestPriority.arrivalTime <= currentTime) {
-                processes.remove(highestPriority);
-                System.out.println("Executing: " + highestPriority.Name);
-                completionTime = currentTime + highestPriority.Burst_Time;
-                System.out.println("Completion time: " + completionTime);
-                turnaroundTime = completionTime - highestPriority.arrivalTime;
-                System.out.println("Turnaround time: " + turnaroundTime);
-                totalTurnaroundTime += turnaroundTime;
-                waitTime = turnaroundTime - highestPriority.originalBurstTime;
-                System.out.println("Waiting time: " + waitTime);
-                totalWaitTime += waitTime;
-                currentTime += highestPriority.Burst_Time;
-                continue;
-            }
-
-            currentTime++;
             for (Process process : processes) {
                 if (process.arrivalTime <= currentTime) {
-                    process.Priority_Number--;
+                    arrivedProcesses.add(process);
                 }
             }
-        }
+            Collections.sort(arrivedProcesses, Comparator.comparingInt(p -> p.Priority_Number));
 
-        System.out.println("Average Wait Time: " + (float) totalWaitTime / size);
-        System.out.println("Average Turnaround Time: " + (float) totalTurnaroundTime / size);
+            if (arrivedProcesses.isEmpty()) {
+                currentTime++;
+                continue;
+            }
+            Process highestPriority = arrivedProcesses.remove(0);
+            for (Process arrivedProcess : arrivedProcesses) {
+                for (Process process : processes) {
+                    if (arrivedProcess.Name.equals(process.Name)) {
+                        process.Priority_Number--;}
+                }
+            }
+
+            arrivedProcesses.clear();
+            processes.remove(highestPriority);
+            System.out.println("Executing: " + highestPriority.Name);
+            completionTime = currentTime + highestPriority.Burst_Time;
+            System.out.println("Completion time: " + completionTime);
+            turnaroundTime = completionTime - highestPriority.arrivalTime;
+            System.out.println("Turnaround time: " + turnaroundTime);
+            totalTurnaroundTime += turnaroundTime;
+            waitTime = turnaroundTime - highestPriority.originalBurstTime;
+            System.out.println("Waiting time: " + waitTime);
+            totalWaitTime += waitTime;
+            currentTime += highestPriority.Burst_Time;
+        }
+        double averageWaitTime = totalWaitTime / size;
+        double averageTurnaroundTime = totalTurnaroundTime / size;
+        System.out.println("Average Waiting Time: " + averageWaitTime);
+        System.out.println("Average Turnaround Time: " + averageTurnaroundTime);
     }
 }
