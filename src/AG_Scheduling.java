@@ -4,7 +4,6 @@ import static java.lang.Math.ceil;
 
 public class AG_Scheduling implements SchedulingAlgorithm {
     Queue<Process> readyQueue = new LinkedList<>();
-    Queue<Process> newArrived = new LinkedList<>();
     Queue<Process> dieQueue = new LinkedList<>();
     Vector<Object> temp = new Vector<>();
     int currentTime = 0;
@@ -74,6 +73,10 @@ public class AG_Scheduling implements SchedulingAlgorithm {
             current.WaitingTime=current.TernARound-current.originalBurstTime;
             waitingTimes.put(current, current.WaitingTime);
             turnaroundTimes.put(current, current.TernARound);
+
+            Duration duration = current.durations.get(current.durations.size()-1);
+            duration.setEndTime(currentTime);
+
             current.quantumTime.add(0);
             dieQueue.add(current);
             processes.remove(current);
@@ -88,7 +91,7 @@ public class AG_Scheduling implements SchedulingAlgorithm {
     }
 
 
-    public Vector<Object> updateQuantum(Process current, int tempQuantum, Queue<Process> readyQueue,
+    public Vector<Object> updateQuantum(Process current, int tempQuantum,
                                         Queue<Process> dieQueue, Vector<Process> processes) {
         Vector<Object> temp = new Vector<>();
         boolean isFinished = false;
@@ -99,12 +102,14 @@ public class AG_Scheduling implements SchedulingAlgorithm {
             tempQuantum = newQuantum;
             isFinished = true;
         } else if (current.Burst_Time==0){
-
             Current.End_Time=currentTime;
             Current.TernARound=Current.End_Time-Current.arrivalTime;
             Current.WaitingTime=Current.TernARound-Current.originalBurstTime;
             waitingTimes.put(Current, Current.WaitingTime);
             turnaroundTimes.put(Current, Current.TernARound);
+
+            Duration duration = current.durations.get(current.durations.size()-1);
+            duration.setEndTime(currentTime);
 
             current.quantumTime.add(0);
             dieQueue.add(current);
@@ -154,20 +159,23 @@ public class AG_Scheduling implements SchedulingAlgorithm {
     @Override
     public void CPUScheduling(Vector<Process> processes) {
         int Size=processes.size();
-        //AG_calc(processes);
+        AG_calc(processes);
         while (!readyQueue.isEmpty() || !processes.isEmpty()) {
             readyQueue = addArrivedProcesses(currentTime, processes, readyQueue, Current, dieQueue);
             if (Current == null && readyQueue.isEmpty()) {
                 currentTime++;
                 continue;
             } else if (Current == null && !readyQueue.isEmpty()) {
-
                 Current = findSmallestProcess(readyQueue);
                 tempQuantum = Current.quantumTime.get(Current.quantumTime.size() - 1);
             } else {
                 if (ProcessFinished) {
+                    oldProcess = Current;
                     if (!dieQueue.contains(Current)){
-                        readyQueue.add(Current);}
+                        readyQueue.add(Current);
+                        Duration duration = Current.durations.get(Current.durations.size()-1);
+                        duration.setEndTime(currentTime);
+                    }
                     Current = readyQueue.remove();
                     tempQuantum = Current.quantumTime.get(Current.quantumTime.size() - 1);
                 } else {
@@ -180,11 +188,23 @@ public class AG_Scheduling implements SchedulingAlgorithm {
                         readyQueue.add(oldProcess);
                         readyQueue.remove(Current);
                     }
+                    if(oldProcess != Current) {
+                        Duration duration = oldProcess.durations.get(oldProcess.durations.size() - 1);
+                        duration.setEndTime(currentTime);
+                    }
                 }
             }
+
             if (Current.getBurstTime() == Current.originalBurstTime) {
                 Current.Start_Time = currentTime;
             }
+
+            if(oldProcess != Current){
+                Duration duration = new Duration();
+                duration.setStartTime(currentTime);
+                Current.durations.add(duration);
+            }
+
             temp = nonPreemptive(Current, currentTime, tempQuantum, dieQueue, processes);
             currentTime = (int) temp.get(0);
             tempQuantum = (int) temp.get(1);
@@ -202,7 +222,7 @@ public class AG_Scheduling implements SchedulingAlgorithm {
                     }
                     readyQueue = addArrivedProcesses(currentTime, processes, readyQueue, Current, dieQueue);
                 }
-                Vector<Object> temp = updateQuantum(Current, tempQuantum, readyQueue, dieQueue, processes);
+                Vector<Object> temp = updateQuantum(Current, tempQuantum, dieQueue, processes);
                 tempQuantum = (int) temp.get(0);
                 ProcessFinished = (boolean) temp.get(1);
             }
@@ -226,5 +246,6 @@ public class AG_Scheduling implements SchedulingAlgorithm {
         for(Process p : dieQueue){
             System.out.println(p.Name+" "+ p.quantumTime);
         }
+
     }
 }
