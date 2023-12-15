@@ -15,8 +15,6 @@ public class AG_Scheduling implements SchedulingAlgorithm {
     int totalWaitingTime = 0;
     int totalTurnaroundTime = 0;
 
-    private static Map<Process, Integer> waitingTimes = new HashMap<>();
-    private static Map<Process, Integer> turnaroundTimes = new HashMap<>();
 
     public Queue<Process> addArrivedProcesses(int currentTime, Vector<Process> processes, Queue<Process> readyQueue, Process current, Queue<Process> dieQueue) {
         for (Process p : processes) {
@@ -71,8 +69,8 @@ public class AG_Scheduling implements SchedulingAlgorithm {
             current.End_Time=currentTime;
             current.TernARound=current.End_Time-current.arrivalTime;
             current.WaitingTime=current.TernARound-current.originalBurstTime;
-            waitingTimes.put(current, current.WaitingTime);
-            turnaroundTimes.put(current, current.TernARound);
+//            waitingTimes.put(current, current.WaitingTime);
+//            turnaroundTimes.put(current, current.TernARound);
 
             Duration duration = current.durations.get(current.durations.size()-1);
             duration.setEndTime(currentTime);
@@ -105,8 +103,6 @@ public class AG_Scheduling implements SchedulingAlgorithm {
             Current.End_Time=currentTime;
             Current.TernARound=Current.End_Time-Current.arrivalTime;
             Current.WaitingTime=Current.TernARound-Current.originalBurstTime;
-            waitingTimes.put(Current, Current.WaitingTime);
-            turnaroundTimes.put(Current, Current.TernARound);
 
             Duration duration = current.durations.get(current.durations.size()-1);
             duration.setEndTime(currentTime);
@@ -159,7 +155,7 @@ public class AG_Scheduling implements SchedulingAlgorithm {
     @Override
     public void CPUScheduling(Vector<Process> processes) {
         int Size=processes.size();
-        AG_calculation(processes);
+         AG_calculation(processes);
         while (!readyQueue.isEmpty() || !processes.isEmpty()) {
             readyQueue = addArrivedProcesses(currentTime, processes, readyQueue, Current, dieQueue);
             if (Current == null && readyQueue.isEmpty()) {
@@ -228,24 +224,18 @@ public class AG_Scheduling implements SchedulingAlgorithm {
             }
 
         }
-        System.out.println("\nTurnaround Time Map:");
-        for (Map.Entry<Process, Integer> entry : turnaroundTimes.entrySet()) {
-            System.out.println("Process " + entry.getKey().Name + ": " + entry.getValue());
-            totalTurnaroundTime += entry.getValue();
-        }
 
-        System.out.println("\nWaiting Time Map:");
-        for (Map.Entry<Process, Integer> entry : waitingTimes.entrySet()) {
-            System.out.println("Process " + entry.getKey().Name + ": " + entry.getValue());
-            totalWaitingTime += entry.getValue();
+        for(Process p : dieQueue){
+            System.out.println('\n'+ p.Name );
+            System.out.println( "turn around: " + p.TernARound);
+            System.out.println("wait time: "+ p.WaitingTime);
+            System.out.println("Quantum history:");
+            System.out.println( p.quantumTime);
+            totalTurnaroundTime+=p.TernARound;
+            totalWaitingTime+=p.WaitingTime;
         }
         System.out.println("total wait around time: "+ (float)totalWaitingTime/Size);
         System.out.println("total turn around time: "+ (float)totalTurnaroundTime/Size);
-
-        System.out.println("\nQuantam history:");
-        for(Process p : dieQueue){
-            System.out.println(p.Name+" "+ p.quantumTime);
-        }
 
     }
 }

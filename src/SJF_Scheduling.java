@@ -17,8 +17,10 @@ public class SJF_Scheduling implements SchedulingAlgorithm {
         int currentTime = 0;
         double totalWaitTime = 0;
         double totalTurnaroundTime = 0;
-        int WaitTime;
-        int TurnaroundTime;
+//        int WaitTime;
+//        int TurnaroundTime;
+
+        Vector<Process> Answer = new Vector<>();
 
         while (!processes.isEmpty()) {
             Process lowest_burst = null;
@@ -39,12 +41,13 @@ public class SJF_Scheduling implements SchedulingAlgorithm {
                 processes.remove(lowest_burst);
                 System.out.println("Executing: " + lowest_burst.Name);
                 currentTime += lowest_burst.Burst_Time+ contextSwitchingTime;
-                TurnaroundTime = currentTime - lowest_burst.arrivalTime;
-                System.out.println("turn around time: " + TurnaroundTime);
-                WaitTime = TurnaroundTime - lowest_burst.originalBurstTime;
-                System.out.println("waiting time: " + WaitTime);
-                totalWaitTime += WaitTime;
-                totalTurnaroundTime += TurnaroundTime;
+                lowest_burst.TernARound = currentTime - lowest_burst.arrivalTime;
+                System.out.println("turn around time: " + lowest_burst.TernARound);
+                lowest_burst.WaitingTime = lowest_burst.TernARound - lowest_burst.originalBurstTime;
+                System.out.println("waiting time: " + lowest_burst.WaitingTime);
+                totalWaitTime += lowest_burst.WaitingTime;
+                totalTurnaroundTime += lowest_burst.TernARound;
+                Answer.add(lowest_burst);
             }
         }
         System.out.println("Average Wait Time: " + (float) totalWaitTime / Size);
